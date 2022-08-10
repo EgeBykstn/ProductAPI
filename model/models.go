@@ -2,8 +2,12 @@ package model
 
 type Product struct {
 	Id       int    `json:"id"`
-	code     string `json:"code"`
-	name     string `json:"name"`
-	category string `json:"category"`
+	Code     string `json:"code"`
+	Name     string `json:"name"`
+	Category string `json:"category"`
 	Price    int    `json:"price"`
+	Color    string `json:"color"`
+	Size     int    `json:"size"`
+}
+type Mirage struct {
 }
