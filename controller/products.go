@@ -8,15 +8,20 @@ import (
 )
 
 //GET
-func (pf *ProductController) GetProduct() ([]model.Product, error) {
-	var products []model.Product
+func GetProduct(c echo.Context) error {
+	models := []model.Product{
+		{Id: 1234, Code: "yönetici", Name: "ege", Category: "person", Price: 35, Color: "blue", Size: 180},
+		{Id: 1234, Code: "yönetici", Name: "ege", Category: "person", Price: 55, Color: "blue", Size: 180},
+		{Id: 1234, Code: "yönetici", Name: "ege", Category: "person", Price: 65, Color: "blue", Size: 180},
+	}
+	/*var products []model.Product
 
 	err := pf.db.Find(&products).Error
 	if err != nil {
 		return nil, err
 	}
-
-	return products, nil
+	*/
+	return c.JSON(http.StatusOK, models)
 }
 
 //POST

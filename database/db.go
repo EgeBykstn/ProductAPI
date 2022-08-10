@@ -33,18 +33,14 @@ func NewDB() *gorm.DB {
 		if *Migrate {
 			DB.AutoMigrate(&model.Product{})
 			DB.Create(seedDb())
-
 		}
 	})
-
 	return DB
 }
 
 func connectDB() (*gorm.DB, error) {
 	conString := config.GetPostgresConnectionString()
-
 	<-time.After(time.Second * 4)
-
 	return gorm.Open(postgres.Open(conString))
 }
 
@@ -54,10 +50,8 @@ func seedDb() []model.Product {
 		"Perfume", "TV", "Refrigerator", "Oven", "Washing Machine",
 		"Dishwashing Machine"}
 	products := make([]model.Product, 50)
-
 	for i := range products {
 		products[i] = model.Product{Name: randomName[rand.Intn(len(randomName))], Detail: "Detail for " + randomName[rand.Intn(len(randomName))], Price: rand.Float32() * (100 - 2), IsCampaign: rand.Uint64()&(1<<63) == 0}
 	}
-
 	return products
 }
