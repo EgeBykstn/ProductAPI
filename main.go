@@ -6,7 +6,7 @@ import (
 
 func main() {
 	//db := database.newDB()
-	//	rc := database.ConnectRedis()
+	//rc := database.ConnectRedis()
 	r := service.NewEcho()
 
 	r.Logger.Fatal(r.Start("localhost:1324"))
