@@ -1,13 +1,30 @@
 package main
 
 import (
-	"product-api/service"
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
+	"net/http"
+	"product-api/controller"
+	"product-api/database"
 )
 
 func main() {
-	//db := database.newDB()
-	//rc := database.ConnectRedis()
-	r := service.NewEcho()
+	// Echo instance
+	e := echo.New()
+	database.NewDB()
+	// Middleware
+	e.Use(middleware.Logger())
+	e.Use(middleware.Recover())
 
-	r.Logger.Fatal(r.Start("localhost:1324"))
+	// Routes
+	e.GET("/", hello)
+	e.GET("/products", controller.GetProduct)
+
+	// Start server
+	e.Logger.Fatal(e.Start(":1323"))
+}
+
+// Handler
+func hello(c echo.Context) error {
+	return c.String(http.StatusOK, "Hello, World!")
 }

@@ -9,5 +9,5 @@ type Product struct {
 	Color    string `json:"color"`
 	Size     int    `json:"size"`
 }
-type Mirage struct {
+type Migrate struct {
 }
