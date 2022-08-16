@@ -11,10 +11,9 @@ type handler struct {
 	DB *gorm.DB
 }
 
-// swager eklenebilir,
-
 func NewEcho(db gorm.DB) *echo.Echo {
 	e := echo.New()
+
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 	e.GET("/", controller.Hello)
