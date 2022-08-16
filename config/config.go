@@ -6,7 +6,7 @@ import (
 
 const (
 	DBUser     = "user"
-	DBPassword = "password"
+	DBPassword = "pass"
 	DBName     = "root"
 	DBHost     = "0.0.0.0"
 	DBPort     = "5432"

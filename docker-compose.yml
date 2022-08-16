@@ -1,24 +1,18 @@
-version: '3.6'
+version: "3.8"
+
 services:
-  postgres:
-    image: postgres
+  database:
+    container_name: database-ps
+    image: postgres:12.8
     restart: always
     environment:
       - POSTGRES_USER=user
-      - POSTGRES_PASSWORD=password
-      - POSTGRES_DB=root
-
+      - POSTGRES_PASSWORD=pass
+      - POSTGRES_DB=crud
     ports:
-      - "5432:5432"
+      - 5432:5432
     volumes:
-      - ./docker_postgres_init.sql:/docker-entrypoint-initdb.d/docker_postgres_init.sql
+      - db:/var/lib/postgresql/data
 
-  pgadmin-compose:
-    image: dpage/pgadmin4
-    environment:
-      PGADMIN_DEFAULT_EMAIL: "test@gmail.com"
-      PGADMIN_DEFAULT_PASSWORD: "test123!"
-    ports:
-      - "16543:80"
-    depends_on:
-      - postgres
+volumes:
+  db:
