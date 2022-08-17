@@ -70,7 +70,7 @@ func AddNewProduct(c echo.Context) error {
 	}
 
 	log.Printf("this is your informations: ", NewProduct)
-	return c.JSON(http.StatusOK, NewProduct)
+	return c.JSONP(http.StatusOK, "Following Product Added \n", NewProduct)
 }
 func UpdateProductByID(c echo.Context) error {
 	UpdatedProduct := new(model.Product)
@@ -79,14 +79,14 @@ func UpdateProductByID(c echo.Context) error {
 	s2, _ := strconv.Atoi(ID)
 	product, err := GetRepoProductByID(s2)
 
-	product = UpdatedProduct
+	product = UpdatedProduct //teker teker eklense değişim olur mu?
 
 	if err != nil {
 		return c.JSON(http.StatusNotFound, "Product Not Found")
 	}
 	db := database.GetDBInstance()
 	db.Save(product)
-	return c.JSON(http.StatusOK, "Products Updated according to ID")
+	return c.JSON(http.StatusOK, "Product Updated according to ID")
 }
 func DeleteProductByID(c echo.Context) error {
 	ID := c.Param("id")
@@ -98,5 +98,5 @@ func DeleteProductByID(c echo.Context) error {
 	db := database.GetDBInstance()
 	db.Delete(product)
 
-	return c.JSON(http.StatusOK, "Following Product Deleted")
+	return c.JSONP(http.StatusOK, "Product Deleted \n", product)
 }
