@@ -7,27 +7,18 @@ import (
 	"product-api/controller"
 )
 
-type handler struct {
-	DB *gorm.DB
-}
-
 func NewEcho(db gorm.DB) *echo.Echo {
 	e := echo.New()
+	pc := controller.NewProductController(db)
 
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 	e.GET("/", controller.Hello)
-	e.GET("/products", controller.GetProduct)
-	e.POST("/products", controller.AddNewProduct)
-	e.GET("/products/:id", controller.ProductByID)
-	e.PUT("/products/:id", controller.UpdateProductByID)
-	e.DELETE("/delete-product/:id", controller.DeleteProductByID)
-	/*
-		e.GET("/search", h.FindProduct)
-		e.GET("/search-params", h.FindProductQueryParams)
-
-		e.POST("/batch-products", h.BatchCreateProduct)
-
-	*/
+	e.GET("/products", pc.GetProducts)
+	e.GET("/filter-products", pc.FindProductQueryParams)
+	e.POST("/products", pc.AddNewProduct)
+	e.GET("/products/:id", pc.GetProductByID)
+	e.PUT("/update-product", pc.UpdateProductByID)
+	e.DELETE("/delete-product/:id", pc.DeleteProductByID)
 	return e
 }
