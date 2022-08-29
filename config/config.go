@@ -1,28 +1,43 @@
 package config
 
 import (
+	"encoding/json"
 	"fmt"
+	"os"
 )
 
-const (
-	DBUser     = "user"
-	DBPassword = "pass"
-	DBName     = "root"
-	DBHost     = "0.0.0.0"
-	DBPort     = "5432"
-	DBType     = "postgres"
-)
+type Config struct {
+	DBUser     string `json:"DBUser"`
+	DBPassword string `json:"DBPassword"`
+	DBName     string `json:"DBName"`
+	DBHost     string `json:"DBHost"`
+	DBPort     string `json:"DBPort"`
+	DBType     string `json:"DBType"`
+}
+type Migrate struct {
+	IsMigrate bool `json:"isMigrate"`
+}
 
+func GetConnString() Config {
+	var cfg Config
+
+	cfgFile, _ := os.Open("config/config.json")
+	defer cfgFile.Close()
+
+	jsonParser := json.NewDecoder(cfgFile)
+	jsonParser.Decode(&cfg)
+	return cfg
+}
 func GetDBType() string {
-	return DBType
+	return GetConnString().DBType
 }
 
 func GetPostgresConnectionString() string {
 	dataBase := fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s sslmode=disable",
-		DBHost,
-		DBPort,
-		DBUser,
-		DBName,
-		DBPassword)
+		GetConnString().DBHost,
+		GetConnString().DBPort,
+		GetConnString().DBUser,
+		GetConnString().DBName,
+		GetConnString().DBPassword)
 	return dataBase
 }
