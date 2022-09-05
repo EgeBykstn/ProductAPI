@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"product-api/database"
+	"product-api/model"
 )
 
 type Config struct {
@@ -13,9 +15,18 @@ type Config struct {
 	DBHost     string `json:"DBHost"`
 	DBPort     string `json:"DBPort"`
 	DBType     string `json:"DBType"`
+	IsMigrate  bool   `json:"isMigrate"`
 }
-type Migrate struct {
-	IsMigrate bool `json:"isMigrate"`
+
+func MigrateProductTable() {
+	DB := database.GetDBInstance()
+	c := Config{}
+	if c.IsMigrate == false {
+		err := DB.AutoMigrate(&model.Product{})
+		if err != nil {
+			panic("migration failed")
+		}
+	}
 }
 
 func GetConnString() Config {

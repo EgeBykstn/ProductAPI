@@ -4,30 +4,22 @@ import (
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"log"
-	"product-api/model"
+	"time"
 )
 
 var (
 	DB *gorm.DB
 )
+var Loc, _ = time.LoadLocation("Europe/Minsk")
 
 func NewDB() *gorm.DB {
-	//migration := config.Migrate{}
-	dbURL := "postgres://user:pass@localhost:5432/crud"
+	//dsn := "host=localhost user=user password=pass dbname=crud port=5432"
+	dbURL := "postgres://user:pass@database:5432/crud"
 	var err error
 	DB, err = gorm.Open(postgres.Open(dbURL), &gorm.Config{})
-	//	DB.Migrator().AddColumn(model.Product{}, "CreatedAt")
-	//	DB.Migrator().AddColumn(model.Product{}, "UpdatedAt")
 
 	if err != nil {
 		log.Fatalln(err)
-	}
-
-	if DB.Migrator().HasTable(model.Product{}) == false {
-		err := DB.AutoMigrate(&model.Product{})
-		if err != nil {
-			panic("migration failed")
-		}
 	}
 	return DB
 }

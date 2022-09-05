@@ -1,131 +1,89 @@
 package controller
 
 import (
-	"errors"
-	"fmt"
 	"github.com/labstack/echo/v4"
-	"gorm.io/gorm"
 	"log"
 	"net/http"
 	"product-api/model"
-	"strconv"
 	"time"
 )
 
-type ProductController struct {
-	DB gorm.DB
-}
-type Repository interface {
-	GetProducts(c echo.Context) error
-	AddNewProduct(c echo.Context) error
-	FindProductQueryParams(c echo.Context) error
-	GetProductByID(c echo.Context) error
-	UpdateProductByID(c echo.Context) error
-	DeleteProductByID(c echo.Context) error
+type ProductRepoController struct {
+	DB ProductRepo
 }
 
-func NewProductController(db gorm.DB) Repository {
-	return &ProductController{
+func NewProductController(db ProductRepo) ProductRepoController {
+	return ProductRepoController{
 		DB: db,
 	}
 }
-
-var _ Repository = ProductController{}
 
 func Hello(c echo.Context) error {
 	return c.String(http.StatusOK, "Hello World!!")
 }
 
 //GET
-func (pc ProductController) GetProducts(c echo.Context) error {
-	Products := []model.Product{}
-
-	err := pc.DB.Find(&Products).Error
+func (pc ProductRepoController) GetProducts(c echo.Context) error {
+	products, err := pc.DB.GetRepoProducts()
 	if err != nil {
 		return err
 	}
 
-	return c.JSON(http.StatusOK, Products)
+	return c.JSON(http.StatusOK, products)
 }
 
-func (pc ProductController) GetProductByID(c echo.Context) error {
-	Products := []model.Product{}
+func (pc ProductRepoController) GetProductByID(c echo.Context) error {
 	ID := c.Param("id")
-	StrID, _ := strconv.Atoi(ID)
-	err := pc.DB.Find(&Products).Error
+	product, err := pc.DB.GetProductByID(ID)
 	if err != nil {
 		return err
 	}
-
-	for i, p := range Products {
-		if p.Id == StrID {
-			return c.JSON(http.StatusOK, Products[i])
-		}
-	}
-	return errors.New("product not found according to ID")
-}
-func (pc ProductController) FindProductQueryParams(c echo.Context) error {
-	//filter := model.Product{}
-	Pcode := c.QueryParam("code")
-	Pname := c.QueryParam("name")
-	var product []model.Product
-	err := pc.DB.Where("code = ? AND name = ?", Pcode, Pname).Find(&product).Error
-
-	if err != nil {
-		return err
-	}
-
 	return c.JSON(http.StatusOK, product)
-	/*
-		Products := []model.Product{}
-		//filter_type := c.Param("type")
-		Pcode := c.QueryParam("code")
-		Pname := c.QueryParam("name")
-		Pcate := c.QueryParam("category")
-		Pprice, _ := strconv.Atoi(c.QueryParam("price"))
-		Pcolor := c.QueryParam("color")
-		Psize, _ := strconv.Atoi(c.QueryParam("size"))
-		a := model.Filter{Code: Pcode, Name: Pname, Category: Pcate, Price: Pprice, Color: Pcolor, Size: Psize}
-		err := pc.DB.Find(&Products).Error
-		if err != nil {
-			return c.JSON(http.StatusOK, "bulamadık")
-		}
-		for i, p := range Products {
-			if p.Code == a.Code && p.Color == a.Color {
-				return c.JSON(http.StatusOK, Products[i])
-			}
-		}
+}
+func (pc ProductRepoController) FindProductQueryParams(c echo.Context) error {
+	pCode := c.QueryParam("code")
+	pName := c.QueryParam("name")
+	pCate := c.QueryParam("category")
 
-		return c.JSON(http.StatusOK, a)
+	product, err := pc.DB.FindProductQueryParams(pCode, pName, pCate)
 
-	*/
+	if err != nil {
+		return err
+	}
+	if product == nil {
+		return c.JSON(http.StatusOK, "there is no product according to entered data")
+	}
+	return c.JSON(http.StatusOK, product)
 }
 
 //POST
-func (pc ProductController) AddNewProduct(c echo.Context) error {
-	NewProduct := new(model.Product)
-	var ai model.AutoInc
+func (pc ProductRepoController) AddNewProduct(c echo.Context) error {
+	NewProduct := model.ProductRepository{}
+	//	var ai model.AutoInc
 	err := c.Bind(&NewProduct)
+	if err != nil {
+		return c.JSON(http.StatusOK, "wrong data type")
+	}
+	NewProduct.Id = 0
 	if NewProduct.Name == "" || NewProduct.Color == "" || NewProduct.Code == "" || NewProduct.Category == "" || NewProduct.Size < 0 || NewProduct.Price < 0 {
 		return c.JSON(http.StatusOK, "missing or wrong entered data")
 	}
-
+	//Loc, _ := time.LoadLocation("Europe/Minsk")
 	NewProduct.CreatedAt = time.Now()
-	NewProduct.UpdatedAt = time.Now()
-	NewProduct.Id = ai.ID()
-	pc.DB.Create(NewProduct)
+	//NewProduct.Id = ai.ID()
 
+	lastProduct, err := pc.DB.AddNewProduct(NewProduct)
 	if err != nil {
-		log.Printf("Failed Processing addInformation request")
-		return echo.NewHTTPError(http.StatusInternalServerError, "Failed Processing addInformation request")
+		return c.JSON(http.StatusOK, "error")
 	}
-	return c.JSONP(http.StatusOK, "Following Product Added \n", NewProduct)
+	time.Now().Local()
+	return c.JSONP(http.StatusOK, "Following Product Added \n", lastProduct)
 }
 
-func (pc ProductController) UpdateProductByID(c echo.Context) error {
-	NewValueProduct := model.Product{}
+func (pc ProductRepoController) UpdateProductByID(c echo.Context) error {
+	NewValueProduct := model.ProductRepository{}
 
-	err := c.Bind(&NewValueProduct) // taking from body
+	err := c.Bind(&NewValueProduct)
 	if err != nil {
 		log.Printf("Failed Processing addInformation request")
 		return echo.NewHTTPError(http.StatusInternalServerError, "Failed Processing addInformation request")
@@ -133,48 +91,19 @@ func (pc ProductController) UpdateProductByID(c echo.Context) error {
 	if NewValueProduct.Name == "" || NewValueProduct.Color == "" || NewValueProduct.Code == "" || NewValueProduct.Category == "" || NewValueProduct.Size < 0 || NewValueProduct.Price < 0 {
 		return c.JSON(http.StatusOK, "missing or wrong entered data")
 	}
-
-	Products := []model.Product{}
-	err = pc.DB.Find(&Products).Error
+	UpdatedProduct, err := pc.DB.UpdateProductByID(NewValueProduct)
+	NewValueProduct.UpdatedAt = time.Now().In(model.Loc)
 	if err != nil {
-		return err
+		return c.JSON(http.StatusOK, "type error")
 	}
-
-	for _, p := range Products {
-		if p.Id == NewValueProduct.Id {
-			fmt.Println(p)
-
-			p = NewValueProduct
-			//	p.UpdatedAt = time.Now()
-			pc.DB.Updates(p)
-
-			//fmt.Println(model.Time{UpdatedAt: time.Now()})
-			return c.JSON(http.StatusOK, p)
-		}
-	}
-
-	return c.JSON(http.StatusOK, "not founded product according to ID")
+	return c.JSON(http.StatusOK, UpdatedProduct)
 }
 
-func (pc ProductController) DeleteProductByID(c echo.Context) error {
+func (pc ProductRepoController) DeleteProductByID(c echo.Context) error {
 	ID := c.Param("id")
-	strID, _ := strconv.Atoi(ID)
-
-	Products := []model.Product{}
-
-	err := pc.DB.Find(&Products).Error
+	deletedPro, err := pc.DB.DeleteProductByID(ID)
 	if err != nil {
-		return err
+		return c.JSON(http.StatusOK, "")
 	}
-
-	for _, p := range Products {
-		if p.Id == strID {
-			fmt.Println(p)
-
-			pc.DB.Delete(p)
-			return c.JSONP(http.StatusOK, "Product Deleted \n", p)
-		}
-	}
-
-	return c.JSON(http.StatusOK, "not founded ID")
+	return c.JSON(http.StatusOK, deletedPro)
 }
