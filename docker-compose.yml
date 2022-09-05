@@ -10,14 +10,16 @@ services:
       - POSTGRES_DB=crud
     ports:
       - 5432:5432
-#  app:
- #   container_name: application-ps
-  #  image: product-api:controller
-   # volumes:
-    #  - .:/app
-   # ports:
-    # - "1323:1323"
-   # environment:
-    #  - DATABASE_USER=user
-     # - DATABASE_PASSWORD=pass
-      #- DATABASE_DB=crud
+  app:
+    container_name: application-ps
+    image: myapp
+    build:
+      context: controller
+    volumes:
+      - .:/app
+    ports:
+     - "1323:1323"
+    environment:
+      - DATABASE_USER=user
+      - DATABASE_PASSWORD=pass
+      - DATABASE_DB=crud

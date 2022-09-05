@@ -1,16 +1,17 @@
 # syntax=docker/dockerfile:1
-FROM product-api:controller
+FROM golang:1.18 AS builder
 
 WORKDIR /app
+COPY . .
+CMD go build main.go
+ENTRYPOINT ["/app/main"]
+#RUN go mod tidy
+#RUN go build -o main main.go
 
-COPY go.mod ./
-COPY go.sum ./
-RUN go mod download
+#FROM golang:1.18
+#WORKDIR /app
+#COPY --from=builder /app/main .
 
-COPY *.go ./
+#EXPOSE 1323
 
-RUN go build -o product-api
-
-EXPOSE 5432
-
-CMD ["./ProductAPI"]
+#ENTRYPOINT ["/app/main"]
