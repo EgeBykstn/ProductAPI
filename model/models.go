@@ -17,17 +17,6 @@ type Product struct {
 	UpdatedAt time.Time `json:"-"`
 	CreatedAt time.Time
 }
-type ProductRepository struct {
-	Id        int       `json:"id" gorm:"primaryKey;autoIncrement:true;unique"`
-	Code      string    `json:"code"`
-	Name      string    `json:"name"`
-	Category  string    `json:"category"`
-	Price     int       `json:"price"`
-	Color     string    `json:"color"`
-	Size      int       `json:"size"`
-	UpdatedAt time.Time `json:"-"`
-	CreatedAt time.Time
-}
 
 var Loc, _ = time.LoadLocation("Europe/Minsk")
 var Products []Product
@@ -47,16 +36,25 @@ type AutoInc struct {
 }*/
 
 /*type ProductDBController struct {
-	DB ProductRepository
+	DB controller.DbRepo
 }
 
-func NewProductController(db ProductRepository) ProductDBController {
+func NewProductController(db controller.DbRepo) ProductDBController {
 	return ProductDBController{
 		DB: db,
 	}
+}
+func (p *ProductDBController) GetRepoProducts() ([]Product, error) {
+	//db := database.GetDBInstance()
+	err := p.DB.Find(&Products).Error
+	if err != nil {
+		return Products, err
+	}
+
+	return Products, nil
 }*/
 
-func (p *ProductRepository) GetRepoProducts() ([]Product, error) {
+func (p *Product) GetRepoProducts() ([]Product, error) {
 	db := database.GetDBInstance()
 	err := db.Find(&Products).Error
 	if err != nil {
@@ -65,7 +63,7 @@ func (p *ProductRepository) GetRepoProducts() ([]Product, error) {
 
 	return Products, nil
 }
-func (p *ProductRepository) AddNewProduct(newPro ProductRepository) (*Product, error) {
+func (p *Product) AddNewProduct(newPro Product) (*Product, error) {
 	db := database.GetDBInstance()
 	NewProduct := Product{}
 	NewProduct = Product(newPro)
@@ -76,7 +74,7 @@ func (p *ProductRepository) AddNewProduct(newPro ProductRepository) (*Product, e
 	}
 	return &NewProduct, nil
 }
-func (p *ProductRepository) UpdateProductByID(mode ProductRepository) (string, error) {
+func (p *Product) UpdateProductByID(mode Product) (string, error) {
 	product := Product{}
 	db := database.GetDBInstance()
 	err := db.Where("id= ?", mode.Id).Find(&product).Error
@@ -87,10 +85,10 @@ func (p *ProductRepository) UpdateProductByID(mode ProductRepository) (string, e
 	db.Updates(product)
 	return "product updated according to ID", nil
 }
-func (p *ProductRepository) FindProductQueryParams(code, name, cate string) ([]Product, error) {
+func (p *Product) FindProductQueryParams(code, name, cate string) ([]Product, error) {
 	db := database.GetDBInstance()
 
-	filter := ProductRepository{}
+	filter := Product{}
 	if code != "" {
 		filter.Code = code
 	}
@@ -108,7 +106,7 @@ func (p *ProductRepository) FindProductQueryParams(code, name, cate string) ([]P
 
 	return Products, nil
 }
-func (p *ProductRepository) GetProductByID(id string) (Product, error) {
+func (p *Product) GetProductByID(id string) (Product, error) {
 	product := Product{}
 	db := database.GetDBInstance()
 	err := db.Where("id= ?", id).Find(&product).Error
@@ -119,7 +117,7 @@ func (p *ProductRepository) GetProductByID(id string) (Product, error) {
 	return product, nil
 }
 
-func (p *ProductRepository) DeleteProductByID(id string) (string, error) {
+func (p *Product) DeleteProductByID(id string) (string, error) {
 	product := Product{}
 	db := database.GetDBInstance()
 	err := db.Where("id= ?", id).Find(&product).Error

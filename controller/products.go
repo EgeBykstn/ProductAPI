@@ -91,8 +91,9 @@ func (pc ProductRepoController) UpdateProductByID(c echo.Context) error {
 	if NewValueProduct.Name == "" || NewValueProduct.Color == "" || NewValueProduct.Code == "" || NewValueProduct.Category == "" || NewValueProduct.Size < 0 || NewValueProduct.Price < 0 {
 		return c.JSON(http.StatusOK, "missing or wrong entered data")
 	}
-	UpdatedProduct, err := pc.DB.UpdateProductByID(NewValueProduct)
 	NewValueProduct.UpdatedAt = time.Now().In(model.Loc)
+	UpdatedProduct, err := pc.DB.UpdateProductByID(NewValueProduct)
+
 	if err != nil {
 		return c.JSON(http.StatusOK, "type error")
 	}

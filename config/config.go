@@ -2,7 +2,6 @@ package config
 
 import (
 	"encoding/json"
-	"fmt"
 	"os"
 	"product-api/database"
 	"product-api/model"
@@ -43,7 +42,7 @@ func GetDBType() string {
 	return GetConnString().DBType
 }
 
-func GetPostgresConnectionString() string {
+/*func GetPostgresConnectionString() string {
 	dataBase := fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s sslmode=disable",
 		GetConnString().DBHost,
 		GetConnString().DBPort,
@@ -52,3 +51,4 @@ func GetPostgresConnectionString() string {
 		GetConnString().DBPassword)
 	return dataBase
 }
+*/
