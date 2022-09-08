@@ -9,14 +9,11 @@ services:
       - POSTGRES_PASSWORD=pass
       - POSTGRES_DB=crud
     ports:
-      - 5432:5432
+      - "5432:5432"
   app:
     container_name: application-ps
-    image: myapp
     build:
-      context: controller
-    volumes:
-      - .:/app
+      context: .
     ports:
      - "1323:1323"
     environment:
