@@ -2,9 +2,8 @@ package config
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
-	"product-api/database"
-	"product-api/model"
 )
 
 type Config struct {
@@ -15,17 +14,6 @@ type Config struct {
 	DBPort     string `json:"DBPort"`
 	DBType     string `json:"DBType"`
 	IsMigrate  bool   `json:"isMigrate"`
-}
-
-func MigrateProductTable() {
-	DB := database.GetDBInstance()
-	c := Config{}
-	if c.IsMigrate == false {
-		err := DB.AutoMigrate(&model.Product{})
-		if err != nil {
-			panic("migration failed")
-		}
-	}
 }
 
 func GetConnString() Config {
@@ -42,13 +30,13 @@ func GetDBType() string {
 	return GetConnString().DBType
 }
 
-/*func GetPostgresConnectionString() string {
-	dataBase := fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s sslmode=disable",
+func GetPostgresConnectionString() string {
+	dataBase := fmt.Sprintf("DBHost=%s DBPort=%s DBUser=%s DBName=%s DBPassword=%s sslmode=disable",
 		GetConnString().DBHost,
 		GetConnString().DBPort,
 		GetConnString().DBUser,
 		GetConnString().DBName,
 		GetConnString().DBPassword)
+
 	return dataBase
 }
-*/
