@@ -1,15 +1,15 @@
 package main
 
 import (
-	"product-api/config"
 	"product-api/database"
 	"product-api/service"
+	"time"
 )
 
 func main() {
+	<-time.After(time.Second * 4)
 	DB := database.NewDB()
-
-	h := service.NewEcho(*DB)
-	config.MigrateProductTable()
+	h := service.NewEcho(DB)
+	database.MigrateProductTable(DB)
 	h.Logger.Fatal(h.Start(":1323"))
 }
