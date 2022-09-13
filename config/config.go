@@ -18,12 +18,11 @@ type Config struct {
 
 func GetConnString() Config {
 	var cfg Config
-
 	cfgFile, _ := os.Open("config/config.json")
 	defer cfgFile.Close()
-
 	jsonParser := json.NewDecoder(cfgFile)
 	jsonParser.Decode(&cfg)
+
 	return cfg
 }
 func GetDBType() string {
@@ -31,7 +30,7 @@ func GetDBType() string {
 }
 
 func GetPostgresConnectionString() string {
-	dataBase := fmt.Sprintf("DBHost=%s DBPort=%s DBUser=%s DBName=%s DBPassword=%s sslmode=disable",
+	dataBase := fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s sslmode=disable",
 		GetConnString().DBHost,
 		GetConnString().DBPort,
 		GetConnString().DBUser,
