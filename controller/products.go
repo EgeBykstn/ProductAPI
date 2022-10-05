@@ -4,7 +4,6 @@ import (
 	"github.com/labstack/echo/v4"
 	"net/http"
 	"product-api/model"
-	"time"
 )
 
 type productController struct {
@@ -43,7 +42,7 @@ func (pc productController) FindProductQueryParams(c echo.Context) error {
 	pCode := c.QueryParam("code")
 	pName := c.QueryParam("name")
 	pCate := c.QueryParam("category")
-	product, err := pc.ProductRepository.FindProductQueryParams(pCode, pName, pCate)
+	product, err := pc.ProductRepository.FindRepoProductQueryParams(pCode, pName, pCate)
 	if err != nil {
 		return err
 	}
@@ -58,34 +57,29 @@ func (pc productController) FindProductQueryParams(c echo.Context) error {
 func (pc productController) AddNewProduct(c echo.Context) error {
 	NewProduct := model.Product{}
 	err := c.Bind(&NewProduct)
-	if err != nil {
-		return c.JSON(http.StatusOK, "wrong data type")
-	}
 	NewProduct.Id = 0
 	if NewProduct.Name == "" || NewProduct.Color == "" || NewProduct.Code == "" || NewProduct.Category == "" || NewProduct.Size < 0 || NewProduct.Price < 0 {
 		return c.JSON(http.StatusOK, "missing or wrong entered data")
 	}
-	NewProduct.CreatedAt = time.Now()
-	lastProduct, err := pc.ProductRepository.AddNewProduct(&NewProduct)
+	err = pc.ProductRepository.AddNewRepoProduct(&NewProduct)
 	if err != nil {
 		return err
 	}
-	time.Now().Local()
 
-	return c.JSONP(http.StatusOK, "Following Product Added \n", lastProduct)
+	return c.JSONP(http.StatusOK, "Following Product Added %\n", err)
 }
 
 //UpdateProductByID updates selected product according to ID
 func (pc productController) UpdateProductByID(c echo.Context) error {
 	NewValueProduct := model.Product{}
 	err := c.Bind(&NewValueProduct)
-	if err != nil {
+	/*if err != nil {
 		return err
-	}
+	}*/
 	if NewValueProduct.Name == "" || NewValueProduct.Color == "" || NewValueProduct.Code == "" || NewValueProduct.Category == "" || NewValueProduct.Size < 0 || NewValueProduct.Price < 0 {
 		return c.JSON(http.StatusOK, "missing or wrong entered data")
 	}
-	UpdatedProduct, err := pc.ProductRepository.UpdateProductByID(&NewValueProduct)
+	UpdatedProduct, _ := pc.ProductRepository.UpdateRepoProductByID(&NewValueProduct)
 	if err != nil {
 		return c.JSON(http.StatusOK, "type error")
 	}
@@ -96,7 +90,7 @@ func (pc productController) UpdateProductByID(c echo.Context) error {
 //DeleteProductByID deletes product according to selected ID
 func (pc productController) DeleteProductByID(c echo.Context) error {
 	ID := c.Param("id")
-	deletedPro := pc.ProductRepository.DeleteProductByID(ID)
+	deletedPro := pc.ProductRepository.DeleteRepoProductByID(ID)
 
 	return c.JSON(http.StatusOK, deletedPro)
 }

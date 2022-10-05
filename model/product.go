@@ -13,5 +13,5 @@ type Product struct {
 	Color     string    `json:"color"`
 	Size      int       `json:"size"`
 	UpdatedAt time.Time `json:"-"`
-	CreatedAt time.Time
+	CreatedAt time.Time `json:"-"`
 }

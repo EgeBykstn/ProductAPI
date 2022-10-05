@@ -3,6 +3,7 @@ package database
 import (
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 	"log"
 	"product-api/config"
 	"product-api/model"
@@ -15,19 +16,11 @@ var (
 
 var Loc, _ = time.LoadLocation("Europe/Minsk")
 
-type GormDB interface {
-	Find(dest interface{}, conds ...interface{}) (tx *gorm.DB)
-	First(dest interface{}, conds ...interface{}) (tx *gorm.DB)
-	Where(query interface{}, args ...interface{}) (tx *gorm.DB)
-	Create(value interface{}) (tx *gorm.DB)
-	Model(value interface{}) (tx *gorm.DB)
-	Updates(values interface{}) (tx *gorm.DB)
-	Delete(value interface{}, conds ...interface{}) (tx *gorm.DB)
-}
-
 func NewDB() *gorm.DB {
 	conString := config.GetPostgresConnectionString()
-	DB, err := gorm.Open(postgres.Open(conString), &gorm.Config{})
+	DB, err := gorm.Open(postgres.Open(conString), &gorm.Config{
+		Logger: logger.Default.LogMode(logger.Info),
+	})
 	if err != nil {
 		log.Fatalln(err)
 	}

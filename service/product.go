@@ -5,12 +5,12 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 	"gorm.io/gorm"
 	"product-api/controller"
-	"product-api/handler"
+	"product-api/repository"
 )
 
 func NewEcho(db *gorm.DB) *echo.Echo {
 	e := echo.New()
-	productRepo := handler.NewProductRepo(db)
+	productRepo := repository.NewProductRepo(db)
 	pc := controller.NewProductController(productRepo)
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
